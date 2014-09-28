@@ -1,12 +1,19 @@
+chrome.history.onVisited.addListener(function(result) {
+    /* result is a HistoryItem: https://developer.chrome.com/extensions/history#type-HistoryItem */
+    // ask, is this a course page?
+});
+
 
 chrome.browserAction.onClicked.addListener(function(tab) {
-  // No tabs or host permissions needed!
-  alert('yo');
-  console.log('Turning ' + tab.url + ' red!');
-  chrome.tabs.executeScript({
-    code: '; alert("wtf"); document.body.style.backgroundColor="red"'
-  }, function() {
-    alert('done');
+  console.log('getting history');
+  // get entire history
+  chrome.history.search({
+      text:'',
+      startTime: 0,
+      endTime: new Date().getTime(),
+      maxResults: 6000
+  }, function(results) {
+      console.log(JSON.stringify(results));
   });
 });
 
