@@ -1,0 +1,17 @@
+{
+    "name": "Course Organizer",
+    "manifest_version": 2,
+    "version": "0.1",
+    "permissions": [
+      "history",
+      "activeTab"
+    ],
+    "browser_action": {
+        "default_title": "Course Pages",
+        "default_icon": "icon_19.png"
+    },
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    }
+}
