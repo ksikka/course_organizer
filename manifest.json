@@ -1,5 +1,5 @@
 {
-    "name": "Course Organizer",
+    "name": "Course Pages",
     "manifest_version": 2,
     "version": "0.1",
     "permissions": [
@@ -8,10 +8,18 @@
     ],
     "browser_action": {
         "default_title": "Course Pages",
-        "default_icon": "icon_19.png"
+        "default_icon": "img/icon_19.png"
     },
     "background": {
-        "scripts": ["background.js"],
+        "scripts": ["lib/underscore-min.js", "lib/util.js",
+                    "src/course.js",
+                    "src/history.js",
+                    "src/suggest.js",
+                    "src/event-page.js"],
         "persistent": false
+    },
+    "omnibox": { "keyword" : "cmu" },
+    "icons": {
+      "16": "img/icon_19.png"
     }
 }
