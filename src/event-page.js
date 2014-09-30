@@ -1,20 +1,17 @@
 var courses = ['15-451', '02-512'];
 
 
-var getCoursePages = function (courseIds, callback) {
-    /* TODO use crowd knowledge and ext-suggested-user-input to provide more pages. */
-    getPagesFromHistory(courseIds, callback);
-};
-
-
 // This event is fired each time the user updates the text in the omnibox,
 // as long as the extension's keyword mode is still active.
 chrome.omnibox.onInputChanged.addListener(suggester);
 
 // This event is fired with the user accepts the input in the omnibox.
 chrome.omnibox.onInputEntered.addListener(function(text) {
-    console.log('inputEntered: ' + text);
-    alert('You just typed "' + text + '"');
+    if (text.indexOf('http://') === 0 || text.indexOf('https://') == 0) {
+        window.open(text);
+    } else {
+        alert('Input ignored because it wasn\'t a URL.');
+    }
 });
 
 

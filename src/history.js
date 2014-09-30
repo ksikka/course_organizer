@@ -6,11 +6,11 @@ var isHistoryItemACourse = function (h, courseId) {
     if (h['title'].indexOf(courseId) != -1) {
         return true;
     }
-    if (h['title'].indexOf(courseId.replace('-','')) != -1) {
+    if (h['title'].replace('-','').indexOf(courseId) != -1) {
         return true;
     }
     return false;
-}
+};
 
 var getPagesFromHistory = function (courseIds, callback) {
   chrome.history.search({
@@ -31,11 +31,11 @@ var getPagesFromHistory = function (courseIds, callback) {
       });
       // filter out history items which are not tagged with a course
       results = _.filter(results, function (r) {
-          return r.course !== undefined;
+          return r.courseId !== undefined;
       });
 
       // turn into a map from course to list of pages
-      results = _.indexBy(results, 'courseId');
+      results = _.groupBy(results, 'courseId');
 
       callback(results);
   });

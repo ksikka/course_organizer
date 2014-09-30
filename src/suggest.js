@@ -32,6 +32,16 @@ var noText = function() {
     chrome.omnibox.setDefaultSuggestion({description: "Start typing a course number..."});
 };
 
+
+var getCoursePages = function (courseIds, callback) {
+    /* TODO use crowd knowledge and ext-suggested-user-input to provide more pages. */
+    getPagesFromHistory(courseIds, callback);
+};
+
+var formatPage = function(h) {
+    return h.title+": "+h.url;
+};
+
 /* Given the text,
  *  compute suggestions for Pages,
  *  return them by calling the callback 'suggest'.
@@ -39,20 +49,35 @@ var noText = function() {
 var suggester = function(text, suggest) {
     if (text.length < 2) {
         noText();
+        suggest([]);
         return;
     }
     console.log('inputChanged: ' + text);
     var state = parse(text);
     if (state === 'invalid') {
         chrome.omnibox.setDefaultSuggestion({description: "Course number \""+text+"\" not found"});
+        suggest([]);
     } else if (state === 'deptonly') {
         chrome.omnibox.setDefaultSuggestion({description: "You typed a department"});
+        suggest([]);
     } else if (state === 'course_prefix') {
         chrome.omnibox.setDefaultSuggestion({description: "You're typing a course"});
+        suggest([]);
     } else if (state === 'coursenumber') {
-        chrome.omnibox.setDefaultSuggestion({description: "You finished typing a course"});
+        chrome.omnibox.setDefaultSuggestion({description: "Here are all the relevant pages for the course:"});
+        var courseId = text.replace('-','');
+        getCoursePages([courseId], function(results) {
+            suggest(_.map(results[courseId], function(r) {
+                var stringToShow  = formatPage(r);
+                console.log('YO: ' + stringToShow);
+                return {
+                    content: r.url,
+                    description: escapeXml(stringToShow)
+                };
+            }));
+        });
     } else if (state === 'course_and_prefix') {
         chrome.omnibox.setDefaultSuggestion({description: "This is the prefix we're looking for!"});
+        suggest([]);
     }
-    suggest([]);
 }
