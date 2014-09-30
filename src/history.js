@@ -40,6 +40,53 @@ var getAllVisits = function(callback) {
         });
     });
 };
+var visitsToURLGraph = function (rootHistoryItems, allVisits) {
+  var byUrl = _.groupBy(allVisits, function(v) {return v.historyItem.url;});
+  var byId = _.indexBy(allVisits, 'visitId');
+  var byParent = _.groupBy(allVisits, 'referringVisitId');
+
+  var url2urlmap = {};
+
+  // populate
+  var urlsToExplore = rootHistoryItems;
+  while (urlsToExplore.length > 0) {
+      var unexploredHistoryItems = [];
+      _.each(urlsToExplore, function(p) {
+
+          var roots = byUrl[p.url];
+
+          _.each(roots, function(root) {
+            if (url2urlmap[root.historyItem.url] === undefined)
+              url2urlmap[root.historyItem.url] = {};
+          });
+
+          _.each(roots, function(root) {
+            var children = byParent[root.visitId] || [];
+
+            if (url2urlmap[root.historyItem.url] === undefined)
+              url2urlmap[root.historyItem.url] = {};
+
+            _.each(children, function(c) {
+
+              if (url2urlmap[root.historyItem.url][c.historyItem.url] === undefined)
+                  url2urlmap[root.historyItem.url][c.historyItem.url] = [];
+
+              url2urlmap[root.historyItem.url][c.historyItem.url].push(c);
+
+              if (url2urlmap[c.historyItem.url] === undefined && urlsToExplore)
+                  unexploredHistoryItems.push(c.historyItem);
+
+            });
+
+          });
+      });
+
+      urlsToExplore = _.uniq(unexploredHistoryItems,function(item){return JSON.stringify(item);});
+  }
+
+  return url2urlmap;
+
+};;
 
 var getPagesFromHistory = function (courseIds, callback) {
   chrome.history.search({
@@ -67,24 +114,11 @@ var getPagesFromHistory = function (courseIds, callback) {
       // turn into a map from course to list of pages
       results = _.groupBy(results, 'courseId');
 
+
       /*DEBUG*/
       resultDEBUG = _.clone(results);
       getAllVisits(function(visits) {
-          console.log(visits);
-          var byUrl = _.groupBy(visits, function(v) {return v.historyItem.url;});
-          var byId = _.indexBy(visits, 'visitId');
-          var byParent = _.groupBy(visits, 'referringVisitId');
-          _.each(resultDEBUG['15451'], function(p) {
-              var roots = byUrl[p.url];
-              _.each(roots, function(root) {
-                var children = byParent[root.visitId] || [];
-                console.log('Root '+root.historyItem.title+': '+root.historyItem.url+' '+children.length);
-                _.each(children, function(c) {
-                  console.log(c);
-                });
-              });
-
-          });
+          console.log( visitsToURLGraph(resultDEBUG['15451'], visits) );
       });
 
       _.each(results, function(pages, courseId) {
