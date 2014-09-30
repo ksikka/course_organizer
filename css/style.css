@@ -1,0 +1,61 @@
+body {
+  font-family: Sans-Serif;
+  background-color: #eee;
+  color: #888888;
+}
+
+#container {
+    max-width: 999px;
+    margin: 40px auto;
+}
+
+form.course-input {
+    margin-top:30px;
+    margin-bottom:30px;
+}
+form.course-input, form.course-input input[type=text] {
+    margin-left: 15px;
+    font-size: 24px;
+}
+form.course-input input[type=submit] {
+    display:none;
+}
+
+/* Glowing Blue Text Input*/
+input[type=text], textarea {
+  -webkit-transition: all 0.30s ease-in-out;
+  -moz-transition: all 0.30s ease-in-out;
+  -ms-transition: all 0.30s ease-in-out;
+  -o-transition: all 0.30s ease-in-out;
+  outline: none;
+  padding: 3px 0px 3px 3px;
+  margin: 5px 1px 3px 0px;
+  border: 1px solid #DDDDDD;
+}
+ 
+input[type=text]:focus, textarea:focus {
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  padding: 3px 0px 3px 3px;
+  margin: 5px 1px 3px 0px;
+  border: 1px solid rgba(81, 203, 238, 1);
+}
+
+/* Some fun CSS from Google Docs */
+.item-section {
+    border-bottom: 1px solid #c4c4c4;
+    border-left: 1px solid #d3d3d3;
+    border-right: 1px solid #d3d3d3;
+    border-top: 1px solid #d3d3d3;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.07)
+}
+
+.item-section .item:hover {
+    background-color:#eef6ff;
+}
+.item-section .item {
+    cursor:pointer;
+    border-bottom:1px solid #e3e3e3;
+    background-color:#fff;
+    color:#444;
+    padding:16px;
+}
