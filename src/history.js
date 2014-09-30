@@ -26,6 +26,7 @@ var getPagesFromHistory = function (courseIds, callback) {
           _.each(courseIds, function(c) {
             if (isHistoryItemACourse(r,c)) {
                 r.courseId = c;
+                r.domain = urlDomain(r.url);
             }
           });
       });
@@ -36,6 +37,9 @@ var getPagesFromHistory = function (courseIds, callback) {
 
       // turn into a map from course to list of pages
       results = _.groupBy(results, 'courseId');
+      _.each(results, function(pages, courseId) {
+          results[courseId] = _.groupBy(pages, 'domain');
+      });
 
       callback(results);
   });

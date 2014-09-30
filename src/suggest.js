@@ -39,7 +39,7 @@ var getCoursePages = function (courseIds, callback) {
 };
 
 var formatPage = function(h) {
-    return h.title+": "+h.url;
+    return "   "+escapeXml(h.title)+": <url>"+escapeXml(h.url)+"</url>";
 };
 
 /* Given the text,
@@ -67,14 +67,16 @@ var suggester = function(text, suggest) {
         chrome.omnibox.setDefaultSuggestion({description: "Here are all the relevant pages for the course:"});
         var courseId = text.replace('-','');
         getCoursePages([courseId], function(results) {
-            suggest(_.map(results[courseId], function(r) {
-                var stringToShow  = formatPage(r);
-                console.log('YO: ' + stringToShow);
-                return {
-                    content: r.url,
-                    description: escapeXml(stringToShow)
-                };
-            }));
+            var listOfSuggestionLists = [];
+            _.each(results[courseId], function(pages, domain) {
+                var suggestions = _.map(pages, function(p) {
+                    var stringToShow = formatPage(p);
+                    return { content: p.url, description: stringToShow };
+                });
+                suggestions[0].description = '<match>'+domain+'</match>' + suggestions[0].description;
+                listOfSuggestionLists.push(suggestions);
+            })
+            suggest(_.flatten(listOfSuggestionLists, true));
         });
     } else if (state === 'course_and_prefix') {
         chrome.omnibox.setDefaultSuggestion({description: "This is the prefix we're looking for!"});

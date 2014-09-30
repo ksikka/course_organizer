@@ -27,4 +27,10 @@ Chrome Extension that automatically organizes your class-relevant pages.
     1. implement the omnibox logic
     2. parse user input string, determing what state they're in
     3. begin suggesting pages based on the course
+    4. Add some formatting
+    5. Group by suggested pages by domain
+
+6. Run into limitations - omnibox can only show 5 suggestions
+
+    1. I really need a new UI, 5 suggestions is not going to cut it
 
