@@ -33,4 +33,10 @@ Chrome Extension that automatically organizes your class-relevant pages.
 6. Run into limitations - omnibox can only show 5 suggestions
 
     1. I really need a new UI, 5 suggestions is not going to cut it
+    2. Maybe I should process the VisitItem graph data to get a better idea of what end structure my data will have.
+
+7. Process VisitItems from HistoryItems to get related pages of known course pages
+
+    1. API is not intuitive and documentation is misleading
+    2. Upon inspection, the data looks immensely useful.
 
