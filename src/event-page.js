@@ -14,6 +14,12 @@ chrome.omnibox.onInputEntered.addListener(function(text) {
     }
 });
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    suggester(request.courseId, function(suggestions) {
+        sendResponse(suggestions);
+    });
+});
+
 
 
 

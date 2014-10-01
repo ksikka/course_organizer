@@ -12,6 +12,10 @@
     },
     "background": {
         "scripts": ["lib/underscore-min.js", "lib/util.js",
+                    "lib/jquery-1.11.1.min.js", "lib/backbone-min.js",
+                    "src/main-page.js",
+                    "lib/underscore-min.map", "lib/backbone-min.map",
+
                     "src/course.js",
                     "src/history.js",
                     "src/suggest.js",
@@ -21,5 +25,11 @@
     "omnibox": { "keyword" : "cmu" },
     "icons": {
       "16": "img/icon_19.png"
-    }
+    },
+    "web_accessible_resources": [
+      "index.html",
+      "css/*",
+      "js/*",
+      "img/*"
+    ]
 }

@@ -12,48 +12,48 @@ var isHistoryItemACourse = function (h, courseId) {
     return false;
 };
 
-var getAllVisits = function(callback) {
+var getAllVisits = function(allHistoryItems, callback) {
     var visitListList = [];
-    chrome.history.search({
-        text:'',
-        startTime: 0,
-        endTime: new Date().getTime(),
-        maxResults: 6000
-    }, function(results) {
-        var done = 0;
-        _.each(results, function(r) {
-            chrome.history.getVisits({url:r.url}, function(visits) {
+    var done = 0;
+    _.each(allHistoryItems, function(r) {
+        chrome.history.getVisits({url:r.url}, function(visits) {
 
-                _.each(visits, function(v) {
-                    v.historyItem = r;
-                });
-
-                visitListList.push(visits);
-
-                done ++;
-                if (done == results.length) {
-                    var visits = _.flatten(visitListList);
-
-                    callback(visits);
-                }
+            // Add a backreference from VisitItem to HistoryItem
+            _.each(visits, function(v) {
+                v.historyItem = r;
             });
+
+            visitListList.push(visits);
+
+            done ++;
+            if (done == allHistoryItems.length) {
+                var visits = _.flatten(visitListList);
+                callback(visits);
+            }
         });
     });
 };
-var visitsToURLGraph = function (rootHistoryItems, allVisits) {
-  var byUrl = _.groupBy(allVisits, function(v) {return v.historyItem.url;});
-  var byId = _.indexBy(allVisits, 'visitId');
-  var byParent = _.groupBy(allVisits, 'referringVisitId');
 
+/*
+ * rootHistoryItems are the history items we which to start exploring from
+ * allVisits are all the VisitItems in the entire history.
+ *  Note that they must have a "historyItem" backreference to the HistoryItem from which they came. */
+var visitsToURLGraph = function (rootHistoryItems, allVisits) {
+  var visitsByUrl = _.groupBy(allVisits, function(v) {return v.historyItem.url;});
+  var visitsByParent = _.groupBy(allVisits, 'referringVisitId');
+
+  /* url -> (url -> visit[]) OPTIONAL */
+  // Existence of the first url means the URL must have been visited once.
+  // Existence of the inner map means other URLs were visited from that URL.
   var url2urlmap = {};
 
   // populate
-  var urlsToExplore = rootHistoryItems;
-  while (urlsToExplore.length > 0) {
+  var historyItemsToExplore = rootHistoryItems;
+  while (historyItemsToExplore.length > 0) {
       var unexploredHistoryItems = [];
-      _.each(urlsToExplore, function(p) {
+      _.each(historyItemsToExplore, function(p) {
 
-          var roots = byUrl[p.url];
+          var roots = visitsByUrl[p.url];
 
           _.each(roots, function(root) {
             if (url2urlmap[root.historyItem.url] === undefined)
@@ -61,7 +61,7 @@ var visitsToURLGraph = function (rootHistoryItems, allVisits) {
           });
 
           _.each(roots, function(root) {
-            var children = byParent[root.visitId] || [];
+            var children = visitsByParent[root.visitId] || [];
 
             if (url2urlmap[root.historyItem.url] === undefined)
               url2urlmap[root.historyItem.url] = {};
@@ -73,15 +73,13 @@ var visitsToURLGraph = function (rootHistoryItems, allVisits) {
 
               url2urlmap[root.historyItem.url][c.historyItem.url].push(c);
 
-              if (url2urlmap[c.historyItem.url] === undefined && urlsToExplore)
+              if (url2urlmap[c.historyItem.url] === undefined && historyItemsToExplore)
                   unexploredHistoryItems.push(c.historyItem);
-
             });
-
           });
       });
 
-      urlsToExplore = _.uniq(unexploredHistoryItems,function(item){return JSON.stringify(item);});
+      historyItemsToExplore = _.uniq(unexploredHistoryItems,function(item){return JSON.stringify(item);});
   }
 
   return url2urlmap;
@@ -94,11 +92,11 @@ var getPagesFromHistory = function (courseIds, callback) {
       startTime: 0,
       endTime: new Date().getTime(),
       maxResults: 6000
-  }, function(results) {
+  }, function(allHistoryItems) {
       // TODO Look at Visit Graph to find addl pages referred to by history pages.
 
       // tag each history item with at most one course
-      _.each(results, function(r) {
+      _.each(allHistoryItems, function(r) {
           _.each(courseIds, function(c) {
             if (isHistoryItemACourse(r,c)) {
                 r.courseId = c;
@@ -106,25 +104,35 @@ var getPagesFromHistory = function (courseIds, callback) {
             }
           });
       });
+
       // filter out history items which are not tagged with a course
-      results = _.filter(results, function (r) {
+      allRootCourseHistoryItems = _.filter(allHistoryItems, function (r) {
           return r.courseId !== undefined;
       });
-
       // turn into a map from course to list of pages
-      results = _.groupBy(results, 'courseId');
+      allRootCourseHistoryItems = _.groupBy(allRootCourseHistoryItems, 'courseId');
 
+      var historyItemsByUrl = _.indexBy(allHistoryItems, 'url');
 
-      /*DEBUG*/
-      resultDEBUG = _.clone(results);
-      getAllVisits(function(visits) {
-          console.log( visitsToURLGraph(resultDEBUG['15451'], visits) );
+      getAllVisits(allHistoryItems, function(visits) {
+          var courseToInfoMap = {};
+          _.each(allRootCourseHistoryItems, function(rootCourseHistItems, courseId) {
+              var url2urlMap = visitsToURLGraph(rootCourseHistItems, visits);
+
+              var relevantUrls = _.keys(url2urlMap);
+              var relevantHistoryItems = _.map(relevantUrls, function(url) {return historyItemsByUrl[url];});
+
+              courseToInfoMap[courseId] = {
+                  recent: _.sortBy(relevantHistoryItems, function(h) {
+                      return -h.lastVisitTime;
+                  }),
+                  frequent: _.sortBy(relevantHistoryItems, function(h) {
+                      return -h.visitCount;
+                  }),
+              };
+          });
+          callback(courseToInfoMap);
       });
 
-      _.each(results, function(pages, courseId) {
-          results[courseId] = _.groupBy(pages, 'domain');
-      });
-
-      callback(results);
   });
 };

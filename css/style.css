@@ -59,3 +59,8 @@ input[type=text]:focus, textarea:focus {
     color:#444;
     padding:16px;
 }
+/*a .item, a .item:hover, a .item:visited, a .item:active {*/
+a, a:hover, a:visited, a:active {
+  color:inherit;
+  text-decoration: none;
+}

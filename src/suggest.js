@@ -29,7 +29,7 @@ var parse = function(text) {
 };
 
 var noText = function() {
-    chrome.omnibox.setDefaultSuggestion({description: "Start typing a course number..."});
+//    chrome.omnibox.setDefaultSuggestion({description: "Start typing a course number..."});
 };
 
 
@@ -52,21 +52,23 @@ var suggester = function(text, suggest) {
         suggest([]);
         return;
     }
-    console.log('inputChanged: ' + text);
     var state = parse(text);
     if (state === 'invalid') {
-        chrome.omnibox.setDefaultSuggestion({description: "Course number \""+text+"\" not found"});
+//        chrome.omnibox.setDefaultSuggestion({description: "Course number \""+text+"\" not found"});
         suggest([]);
     } else if (state === 'deptonly') {
-        chrome.omnibox.setDefaultSuggestion({description: "You typed a department"});
+//        chrome.omnibox.setDefaultSuggestion({description: "You typed a department"});
         suggest([]);
     } else if (state === 'course_prefix') {
-        chrome.omnibox.setDefaultSuggestion({description: "You're typing a course"});
+//        chrome.omnibox.setDefaultSuggestion({description: "You're typing a course"});
         suggest([]);
     } else if (state === 'coursenumber') {
-        chrome.omnibox.setDefaultSuggestion({description: "Here are all the relevant pages for the course:"});
+//        chrome.omnibox.setDefaultSuggestion({description: "Here are all the relevant pages for the course:"});
         var courseId = text.replace('-','');
-        getCoursePages([courseId], function(results) {
+        getCoursePages([courseId], function(courseToInformation) {
+            var infoMap = courseToInformation[courseId];
+            suggest(infoMap);
+        /* this is deprecated now...
             var listOfSuggestionLists = [];
             _.each(results[courseId], function(pages, domain) {
                 var suggestions = _.map(pages, function(p) {
@@ -77,9 +79,10 @@ var suggester = function(text, suggest) {
                 listOfSuggestionLists.push(suggestions);
             })
             suggest(_.flatten(listOfSuggestionLists, true));
+        */
         });
     } else if (state === 'course_and_prefix') {
-        chrome.omnibox.setDefaultSuggestion({description: "This is the prefix we're looking for!"});
+//        chrome.omnibox.setDefaultSuggestion({description: "This is the prefix we're looking for!"});
         suggest([]);
     }
 }

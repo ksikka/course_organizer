@@ -11,18 +11,28 @@
     <div id="container">
         <form class="course-input" action="#">
             <label for="course">Enter your course number: </label>
-            <input type="text" size="6" name="course" placeholder="15251">
-            <input type="submit" disabled>
+            <input type="text" size="6" name="course" autofocus placeholder="15251">
+            <input type="submit">
         </form>
-        <div class="item-section">
-            <div class="item">
-                Test Item
-            </div>
-            <div class="item">
-                Test Item
+
+        <div id="recently-viewed">
+            <h1>Recently Viewed</h1>
+            <hr>
+            <div class="item-section">
+                <div class="item">
+                    test item
+                </div>
+                <a href="https://google.com"><div class="item">
+                    test item
+                </div></a>
             </div>
         </div>
     </div>
 
+    <script src="lib/jquery-1.11.1.min.js"></script>
+    <script src="lib/underscore-min.js"></script>
+    <script src="lib/backbone-min.js"></script>
+    <script src="lib/util.js"></script>
+    <script src="src/main-page.js"></script>
 </body>
 </html>
