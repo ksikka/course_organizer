@@ -6,10 +6,16 @@
       "history",
       "activeTab"
     ],
+    "options_page": "index.html",
     "browser_action": {
         "default_title": "Course Pages",
         "default_icon": "img/icon_19.png"
     },
+    "content_scripts": [{
+        "js": ["src/content-script.js"],
+        "matches": ["https://developer.chrome.com/*"]
+    }],
+    "content_security_policy" : "default-src 'self'; img-src 'self' http://gravatar.com; script-src 'unsafe-eval';  object-src 'unsafe-eval';",
     "background": {
         "scripts": ["lib/underscore-min.js", "lib/util.js",
                     "lib/jquery-1.11.1.min.js", "lib/backbone-min.js",

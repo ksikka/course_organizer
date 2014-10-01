@@ -14,16 +14,15 @@ chrome.omnibox.onInputEntered.addListener(function(text) {
     }
 });
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    suggester(request.courseId, function(suggestions) {
-        sendResponse(suggestions);
+
+chrome.runtime.onConnect.addListener(function(port) {
+  console.assert(port.name == "knockknock");
+  port.onMessage.addListener(function(msg) {
+    suggester(msg.courseId, function(suggestions) {
+        port.postMessage(suggestions);
     });
+  });
 });
-
-
-
-
-
 
 
 
