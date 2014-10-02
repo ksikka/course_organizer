@@ -40,3 +40,13 @@ Chrome Extension that automatically organizes your class-relevant pages.
     1. API is not intuitive and documentation is misleading
     2. Upon inspection, the data looks immensely useful.
 
+8. Create HTML UI for Recently Viewed and Frequently Viewed
+
+    1. HTML/CSS Design
+    2. Modify the Script to return data in the desired format
+    3. Realize that it looks ugly, and I need thumbnails and grouping by domain.
+    4. PS I will use chrome.tabs.captureVisibleTab to get thumbnails
+
+Urgently I need a fix for group-by-domain and blackboard
+
+
